@@ -28,6 +28,7 @@ static dispatch_once_t _predicate;
             _config = [NSKeyedUnarchiver unarchivedObjectOfClass:[self class] fromData:archiver error:&error];
             if (error) {
                 NSLog(@"解档失败:%@", error);
+                _config = [[self alloc]init];
             }
         }
     });

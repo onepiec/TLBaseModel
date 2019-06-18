@@ -56,6 +56,7 @@
         wifeModel.weight = 56.5;
         fatherModel.wife = wifeModel;
         
+        fatherModel.arr = @[wifeModel];
         [UserModel saveData:UserKey0];
         
         UserModel *newModel = [UserModel sharedInstance:UserKey0];
