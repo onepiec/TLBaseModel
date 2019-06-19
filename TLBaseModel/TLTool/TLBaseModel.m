@@ -40,6 +40,7 @@ static dispatch_once_t _predicate;
     NSError *error = nil;
     
     NSData *archiver = [NSKeyedArchiver archivedDataWithRootObject:[self sharedInstance:key] requiringSecureCoding:YES error:&error];
+       
     if (error) {
         NSLog(@"更新数据失败:%@", error);
     }
@@ -49,6 +50,7 @@ static dispatch_once_t _predicate;
     _config = nil;
     _predicate = 0l;
 }
+
 + (void)clearData:(NSString *)key{
     
     if (!key || key.length ==0) return;
@@ -93,7 +95,21 @@ static dispatch_once_t _predicate;
             NSString *classNameStr = [self tlGetPropertyRealType:property_attr];
             
             if (classNameStr.length >0) {
-                [self setValue:[aDecoder decodeObjectOfClass:NSClassFromString(classNameStr) forKey:strName] forKey:strName];
+                
+                if ([classNameStr isEqualToString:@"NSArray"]
+                    ||[classNameStr isEqualToString:@"NSMutableArray"]) {
+                    
+                    NSArray *subClassArr = [TLBaseModel getAllSubClassNameWithClass:NSClassFromString(@"TLBaseModel")];
+                    NSMutableArray *subMutClassArr = subClassArr.mutableCopy;
+                    [subMutClassArr addObject:NSClassFromString(@"NSArray")];
+                    [subMutClassArr addObject:NSClassFromString(@"NSMutableArray")];
+                    
+                    NSSet *sets = [NSSet setWithArray:subMutClassArr];
+                    [self setValue:[aDecoder decodeObjectOfClasses:sets forKey:strName] forKey:strName];
+                }else{
+                    [self setValue:[aDecoder decodeObjectOfClass:NSClassFromString(classNameStr) forKey:strName] forKey:strName];
+                }
+                
             }else{
                 if ([aDecoder decodeObjectForKey:strName]) {
                     [self setValue:[aDecoder decodeObjectForKey:strName] forKey:strName];
@@ -119,5 +135,24 @@ static dispatch_once_t _predicate;
         free(des_attr);
     }
     return type;
+}
++ (NSArray *)getAllSubClassNameWithClass:(Class)class{
+    
+    NSMutableArray *results = [NSMutableArray array];
+    int numClasses;
+    Class *classes = NULL;
+    numClasses = objc_getClassList(NULL,0);
+    if (numClasses > 0) {
+        classes = (__unsafe_unretained Class *)malloc(sizeof(Class) * numClasses);
+        numClasses = objc_getClassList(classes, numClasses);
+        for (int i = 0; i < numClasses; i++) {
+            if (class_getSuperclass(classes[i]) == class){
+                [results addObject:classes[i]];
+
+            }
+        }
+        free(classes);
+    }
+    return results;
 }
 @end

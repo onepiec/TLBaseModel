@@ -39,6 +39,28 @@
     
     if (10 == btn.tag) {
         
+#if 1
+
+        UserModel *userModel = [UserModel sharedInstance:UserKey0];
+        
+        FatherModel *fatherModel1 = [[FatherModel alloc]init];
+        fatherModel1.arr = @[@"1",@"2",@"3"];
+        fatherModel1.name = @"xxx";
+        fatherModel1.phone = 18599990001;
+        
+        FatherModel *fatherModel2 = [[FatherModel alloc]init];
+        fatherModel2.arr = @[@"3",@"2",@"1"];
+        fatherModel2.name = @"yyyy";
+        fatherModel2.phone = 18599990002;
+        
+        userModel.arr = @[fatherModel1 ,fatherModel2];
+        [UserModel saveData:UserKey0];
+        
+        UserModel *newModel = [UserModel sharedInstance:UserKey0];
+        NSLog(@"----------%@",newModel);
+        
+#else
+        
         UserModel *userModel = [UserModel sharedInstance:UserKey0];
         userModel.dic = @{@"sex":@"man"};
         userModel.name = @"tl";
@@ -56,11 +78,12 @@
         wifeModel.weight = 56.5;
         fatherModel.wife = wifeModel;
         
-        fatherModel.arr = @[wifeModel];
         [UserModel saveData:UserKey0];
         
         UserModel *newModel = [UserModel sharedInstance:UserKey0];
         NSLog(@"----------%@",newModel);
+#endif
+        
         
     }else if (11 == btn.tag){
         
